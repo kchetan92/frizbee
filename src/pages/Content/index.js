@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import { printLine } from './modules/print';
+import { modal } from "./modules/modal";
 
 console.log('Content script works!!!!');
 console.log('Must reload extension for modifications to take effect.');
@@ -17,6 +18,8 @@ const getStream = async () => {
     stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
   }
 };
+
+let localModal = null
 
 const capture = async () => {
   const canvas = document.createElement('canvas');
@@ -41,6 +44,11 @@ const capture = async () => {
     const dataURL = canvas.toDataURL('image/png');
 
     const data = atob(dataURL.substring('data:image/png;base64,'.length));
+
+    if (localModal) {
+      localModal.updateImage(dataURL);
+    }
+
     const dataAsArray = new Uint8Array(data.length);
 
     for (var i = 0, len = data.length; i < len; ++i) {
@@ -95,5 +103,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         FileSaver.saveAs(blob, 'export.zip');
       });
     }
+  }
+
+  if (request.message === 'show_modal') {
+    sendResponse('ok');
+    if (!localModal) {
+      localModal = modal();
+      localModal.init();
+    }
+
   }
 });

@@ -28,6 +28,18 @@ const Popup = () => {
     });
   };
 
+  const showModal = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { message: 'show_modal' },
+        function (response) {
+          console.log(response);
+        }
+      );
+    });
+  };
+
   return (
     <div className="App">
       <button
@@ -43,6 +55,13 @@ const Popup = () => {
         }}
       >
         Stop Recording
+      </button>
+      <button
+        onClick={() => {
+          showModal();
+        }}
+      >
+        Show Modal
       </button>
     </div>
   );
