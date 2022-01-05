@@ -31,45 +31,44 @@ const capture = async () => {
       zip = new JSZip();
     }
 
-    video.srcObject = stream;
-    let track = stream.getVideoTracks()[0];
-    let imageCapture = new ImageCapture(track);
+    localModal.hideModal();
 
-    let imageBitmap = await imageCapture.grabFrame();
+    setTimeout(async () => {
+      video.srcObject = stream;
+      let track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
 
-    canvas.width = imageBitmap.width;
-    canvas.height = imageBitmap.height;
-    context.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
+      let imageBitmap = await imageCapture.grabFrame();
 
-    const dataURL = canvas.toDataURL('image/png');
+      canvas.width = imageBitmap.width;
+      canvas.height = imageBitmap.height;
+      context.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
 
-    const data = atob(dataURL.substring('data:image/png;base64,'.length));
+      const dataURL = canvas.toDataURL('image/png');
 
-    if (localModal) {
-      localModal.updateImage(dataURL);
-    }
+      const data = atob(dataURL.substring('data:image/png;base64,'.length));
 
-    const dataAsArray = new Uint8Array(data.length);
+      if (localModal) {
+        localModal.updateImage(dataURL);
+      }
 
-    for (var i = 0, len = data.length; i < len; ++i) {
-      dataAsArray[i] = data.charCodeAt(i);
-    }
+      const dataAsArray = new Uint8Array(data.length);
 
-    var blob = new Blob([dataAsArray.buffer], { type: 'image/png' });
+      for (var i = 0, len = data.length; i < len; ++i) {
+        dataAsArray[i] = data.charCodeAt(i);
+      }
 
-    const filename = 'screenshot' + numberCounter++ + '.png';
-    console.log(filename);
+      var blob = new Blob([dataAsArray.buffer], { type: 'image/png' });
 
-    zip.file(filename, blob);
+      const filename = 'screenshot' + numberCounter++ + '.png';
+      console.log(filename);
 
-    // const link = document.createElement('a');
-    // link.download = 'screenshot1.png';
-    // link.href = frame;
-    // link.setAttribute('target', '_blank');
-    // link.click();
-    // link.remove();
+      zip.file(filename, blob);
+      localModal.showModal();
+      localModal.updateImageCount(numberCounter);
+    }, 100)
 
-    // window.location.href = frame;
+
   } catch (err) {
     console.error('Error: ' + err);
   }
@@ -111,6 +110,5 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       localModal = modal();
       localModal.init();
     }
-
   }
 });

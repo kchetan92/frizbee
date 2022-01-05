@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../../assets/img/logo.svg';
 import Greetings from '../../containers/Greetings/Greetings';
-import './Popup.css';
+import './Popup.scss';
 
 const Popup = () => {
   const startRecording = () => {
@@ -40,6 +40,10 @@ const Popup = () => {
     });
   };
 
+  const login = () => {
+    chrome.tabs.create({ url: 'index.html' });
+  }
+
   return (
     <div className="App">
       <button
@@ -63,6 +67,9 @@ const Popup = () => {
       >
         Show Modal
       </button>
+      <button onClick={() => {
+        login();
+      }}>Try login</button>
     </div>
   );
 };

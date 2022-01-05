@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import logo from '../../assets/img/logo.svg';
 import './Newtab.css';
 import './Newtab.scss';
 
 const Newtab = () => {
+
   return (
     <div className="App">
       <header className="App-header">
@@ -20,6 +21,11 @@ const Newtab = () => {
           Learn React!
         </a>
         <h6>The color of this paragraph is defined using SASS.</h6>
+        <button onClick={() => {
+          chrome.identity.getAuthToken({ interactive: true }, function (token) {
+            console.log(token);
+          });
+        }}>Login</button>
       </header>
     </div>
   );
