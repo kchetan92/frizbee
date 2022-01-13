@@ -26,6 +26,7 @@ const getShadow = (() => {
   const maker = () => {
     if (!shadowContainer) {
       const container: HTMLDivElement = document.createElement('div');
+      container.setAttribute('style', 'all:initial');
       document.body.appendChild(container);
       container.attachShadow({ mode: 'open' });
       if (container.shadowRoot)
@@ -57,6 +58,7 @@ const css = `<style>
   z-index: 300;
   background-color: #1f1f1f;
   color: #fff;
+  padding-bottom: 12px;
 }
 
  .modal-container.expanded {
@@ -124,5 +126,19 @@ const css = `<style>
 .block-button.red {
   background: #D12610;
   color: #fff;
+}
+
+.block-button.grey {
+  background: #767676;
+  color:#FFF
+  cursor:default;
+}
+
+.drag-button {
+  cursor: grab;
+}
+
+.drag-button.dragging {
+  cursor: grabbing;
 }
 </style>`;
