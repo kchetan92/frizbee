@@ -47,8 +47,11 @@ const css = `<style>
   --white: #fff;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
 .parent-selector {
-  all: initial
+  all: initial;
+  font-family: 'Inter', sans-serif;
 }
 
  .modal-container {
@@ -162,6 +165,8 @@ const css = `<style>
 .image-preview {
   padding: 10px;
   min-height: 80px;
+  text-align:center;
+  font-weight: bold;
 }
 
 .image-preview.empty p {
@@ -182,6 +187,16 @@ const css = `<style>
 
 .preview-img {
   width: 100%;
+}
+
+.none-img {
+  margin: 0;
+  background: grey;
+  padding: 30px 0;
+}
+
+.image-count {
+  text-align: center;
 }
 
 </style>`;

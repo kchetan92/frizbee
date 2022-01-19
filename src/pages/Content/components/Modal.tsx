@@ -8,7 +8,6 @@ const Modal = () => {
   const moveButton = useRef<HTMLButtonElement | null>(null);
   const modalBody = useRef<HTMLDivElement | null>(null);
   const mediaStream = useRef<MediaStream | null>(null);
-  const lastImage = useState<any>(null);
 
   useEffect(() => {
     if (moveButton?.current && modalBody?.current) {

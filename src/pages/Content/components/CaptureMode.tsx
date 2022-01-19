@@ -9,6 +9,7 @@ const CaptureMode = (pr: { mediaStream: MediaStream }) => {
   const [latestImage, setNewImage] = useState<string | null>(null);
   const allImages = useRef<Set<string>>(new Set());
   const [imageCount, setImageCount] = useState<number>(0);
+  const [mode, setMode] = useState<'running' | 'export'>('running');
 
   useEffect(() => {
     console.log('added');
@@ -64,12 +65,15 @@ const CaptureMode = (pr: { mediaStream: MediaStream }) => {
 
   return (
     <>
-      <div className={'image-preview ' + latestImage === null ? 'empty' : ''}>
-        <p>None</p>
+      <div className={'image-preview ' + (latestImage === null ? 'empty' : '')}>
+        <p className="none-img">None</p>
         <img ref={imgElement} className="preview-img" />
       </div>
       <p className="image-count">{imageCount} Image</p>
-      <button className="block-button red">Stop</button>
+      {mode === 'running' && <button className="block-button red">Stop</button>}
+      {mode === 'export' && (
+        <button className="block-button grey">Export</button>
+      )}
       <canvas className="hidden" ref={canvasElement} />
       <video className="hidden" ref={videoElement} />
     </>
