@@ -27,6 +27,7 @@ const getShadow = (() => {
     if (!shadowContainer) {
       const container: HTMLDivElement = document.createElement('div');
       container.setAttribute('style', 'all:initial');
+      container.classList.add('frizbee-02234');
       document.body.appendChild(container);
       container.attachShadow({ mode: 'open' });
       if (container.shadowRoot)
@@ -141,4 +142,46 @@ const css = `<style>
 .drag-button.dragging {
   cursor: grabbing;
 }
+
+.hidden {
+  display: none;
+}
+
+// .event-catcher {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   height: 100%;
+//   width: 100%;
+//   pointer-events: none;
+//   background-color: white;
+//   opacity: 0;
+//   z-index:4000;
+// }
+
+.image-preview {
+  padding: 10px;
+  min-height: 80px;
+}
+
+.image-preview.empty p {
+  display: block;
+}
+
+.image-preview.empty img {
+  display: none;
+}
+
+.image-preview p {
+  display: none;
+}
+
+.image-preview img {
+  display: block;
+}
+
+.preview-img {
+  width: 100%;
+}
+
 </style>`;

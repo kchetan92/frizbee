@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import CaptureMode from './CaptureMode';
 import makeDraggable from './makeDraggable';
 
 const Modal = () => {
@@ -7,6 +8,7 @@ const Modal = () => {
   const moveButton = useRef<HTMLButtonElement | null>(null);
   const modalBody = useRef<HTMLDivElement | null>(null);
   const mediaStream = useRef<MediaStream | null>(null);
+  const lastImage = useState<any>(null);
 
   useEffect(() => {
     if (moveButton?.current && modalBody?.current) {
@@ -20,7 +22,11 @@ const Modal = () => {
     } else {
       setStage('loading');
       await getStream(mediaStream);
-      setStage('capturing');
+      if (mediaStream.current) {
+        setStage('capturing');
+      } else {
+        setStage('error');
+      }
     }
   };
 
@@ -42,7 +48,10 @@ const Modal = () => {
 
       {stage === 'initial' && InitialStage}
       {stage === 'loading' && <Loading />}
-      {stage === 'capturing' && <Loading />}
+      {stage === 'capturing' && mediaStream?.current && (
+        <CaptureMode mediaStream={mediaStream?.current} />
+      )}
+      {stage === 'error' && <Error />}
     </div>
   );
 };
@@ -101,18 +110,23 @@ const Loading = () => (
   </>
 );
 
+const Error = () => (
+  <>
+    <Logo />
+    <button className="block-button grey">Error</button>
+  </>
+);
+
 const getStream = async (
   stream: React.MutableRefObject<MediaStream | null>
 ) => {
-  stream.current = await navigator.mediaDevices.getDisplayMedia({
-    video: true,
-  });
+  stream.current = await navigator.mediaDevices
+    .getDisplayMedia({
+      video: true,
+    })
+    .catch((err) => null);
 };
 
-type stageOptions = 'initial' | 'loading' | 'capturing';
-
-const CaptureMode = () => {
-  return <button className="block-button red">Stop</button>;
-};
+type stageOptions = 'initial' | 'loading' | 'capturing' | 'error';
 
 export default Modal;
