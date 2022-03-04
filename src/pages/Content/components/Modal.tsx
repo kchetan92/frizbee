@@ -2,12 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import CaptureMode from './CaptureMode';
 import makeDraggable from './makeDraggable';
 
-const Modal = () => {
+const Modal = (pr: {
+  mediaStreamAvailable?: boolean;
+  stage?: stageOptions;
+}) => {
   const [expand, setExpanded] = useState<boolean>(false);
-  const [stage, setStage] = useState<stageOptions>('initial');
+  const [stage, setStage] = useState<stageOptions>(pr.stage ?? 'initial');
   const moveButton = useRef<HTMLButtonElement | null>(null);
   const modalBody = useRef<HTMLDivElement | null>(null);
   const mediaStream = useRef<MediaStream | null>(null);
+  const mediaStreamAvailable = useRef<boolean>(
+    pr.mediaStreamAvailable ?? false
+  );
+  const [modalVisible, setModalVisible] = useState<boolean>(true);
 
   useEffect(() => {
     if (moveButton?.current && modalBody?.current) {
@@ -15,14 +22,33 @@ const Modal = () => {
     }
   }, [moveButton, modalBody]);
 
+  useEffect(() => {
+    chrome.storage.local.set({
+      stage,
+    });
+  }, [stage]);
+
+  chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (changes.mediaStreamAvailable && changes.mediaStreamAvailable.newValue) {
+      mediaStreamAvailable.current = changes.mediaStreamAvailable.newValue;
+    }
+    if (changes.stage && changes.stage.newValue !== stage) {
+      setStage(changes.stage.newValue);
+    }
+  });
+
   const startCapture = async () => {
     if (mediaStream?.current) {
       setStage('capturing');
     } else {
       setStage('loading');
-      await getStream(mediaStream);
+      const mediaObj = await getStream(mediaStream);
+      console.log(mediaObj);
       if (mediaStream.current) {
         setStage('capturing');
+        chrome.storage.local.set({
+          mediaStreamAvailable: true,
+        });
       } else {
         setStage('error');
       }
@@ -38,18 +64,34 @@ const Modal = () => {
     </>
   );
 
+  const Exporting = (
+    <div className="exporting-screen">
+      <img src={chrome.runtime.getURL('/assets/img/barber_pole.png')} />
+    </div>
+  );
+
   return (
     <div
-      className={'modal-container ' + (expand ? 'expanded' : '')}
+      className={
+        'modal-container ' +
+        (expand ? 'expanded ' : '') +
+        (modalVisible ? '' : 'hide ')
+      }
       ref={modalBody}
     >
       <NavBar expanded={expand} setExpanded={setExpanded} ref={moveButton} />
 
       {stage === 'initial' && InitialStage}
       {stage === 'loading' && <Loading />}
-      {stage === 'capturing' && mediaStream?.current && (
-        <CaptureMode mediaStream={mediaStream?.current} />
-      )}
+      {stage === 'capturing' &&
+        (mediaStream?.current || mediaStreamAvailable.current) && (
+          <CaptureMode
+            mediaStream={mediaStream?.current || undefined}
+            setStage={setStage}
+            setModalVisible={setModalVisible}
+          />
+        )}
+      {stage === 'exporting' && Exporting}
       {stage === 'error' && <Error />}
     </div>
   );
@@ -88,7 +130,12 @@ const NavBar = React.forwardRef(
         <button ref={ref} className="drag-button">
           <img src={chrome.runtime.getURL('/assets/img/Icons/Move.png')} />
         </button>
-        <button>
+        <button
+          onClick={() => {
+            debugger;
+            chrome.storage.local.set({ modalView: 'close' }, () => {});
+          }}
+        >
           <img src={chrome.runtime.getURL('/assets/img/Icons/Settings.png')} />
         </button>
       </div>
@@ -124,8 +171,15 @@ const getStream = async (
       video: true,
     })
     .catch((err) => null);
+  return stream.current;
 };
 
-type stageOptions = 'initial' | 'loading' | 'capturing' | 'error';
+export type stageOptions =
+  | 'initial'
+  | 'loading'
+  | 'capturing'
+  | 'error'
+  | 'exported'
+  | 'exporting';
 
 export default Modal;

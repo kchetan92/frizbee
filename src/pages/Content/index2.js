@@ -78,6 +78,16 @@ const stopStream = () => {
   if (stream !== null) stream.getTracks().forEach((track) => track.stop());
 };
 
+chrome.runtime.sendMessage({message:'get_store'}, function(response) {
+  console.log(response);
+  if(response && response.modalView === 'open') {
+    if (!localModal) {
+      localModal = modal();
+      localModal.init();
+    }
+  }
+})
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(
     sender.tab

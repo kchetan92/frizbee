@@ -6,6 +6,7 @@
     "service_worker": "background.bundle.js"
   },
   "action": {
+    "default_popup": "popup.html",
     "default_icon": "icon-34.png"
   },
   "chrome_url_overrides": {},
@@ -45,6 +46,5 @@
         "<all_urls>"
       ]
     }
-  ],
-  "permissions": ["storage"]
+  ]
 }

@@ -1,21 +1,47 @@
 import React from 'react';
 import { render } from 'react-dom';
 
-import ModalComponent from './components/Modal';
+import Modal, { stageOptions } from './components/Modal';
 
-const Modal = () => {
-  return <ModalComponent />;
+const initModal = (pr: {
+  empty?: boolean;
+  mediaStreamAvailable?: boolean;
+  stage?: stageOptions;
+}) => {
+  const shadow = getShadow();
+  if (shadow.shadowRoot) {
+    const container = shadow.shadowRoot.getElementById('container');
+    if (container) {
+      render(pr.empty ? <></> : <Modal {...pr} />, container);
+    }
+  }
 };
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.message === 'show_modal') {
-    console.log('show modal');
-    const shadow = getShadow();
-    if (shadow.shadowRoot) {
-      const container = shadow.shadowRoot.getElementById('container');
-      if (container) {
-        render(<Modal />, container);
-      }
+chrome.storage.local.get(
+  ['modalView', 'mediaStreamAvailable', 'stage'],
+  function (res) {
+    if (res['modalView'] === 'open') {
+      initModal({
+        empty: false,
+        mediaStreamAvailable: res['mediaStreamAvailable'],
+        stage: res['stage'],
+      });
+    }
+  }
+);
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+  if (typeof changes.modalView !== 'undefined') {
+    if (
+      changes.modalView.newValue === 'close' &&
+      changes.modalView.oldValue !== 'close'
+    ) {
+      initModal({ empty: true });
+    } else if (
+      changes.modalView.newValue === 'open' &&
+      changes.modalView.oldValue !== 'open'
+    ) {
+      initModal({ empty: false });
     }
   }
 });
@@ -59,7 +85,7 @@ const css = `<style>
   position: fixed;
   top: 10px;
   right: 10px;
-  z-index: 300;
+  z-index: 999999;
   background-color: #1f1f1f;
   color: #fff;
   padding-bottom: 12px;
@@ -67,6 +93,10 @@ const css = `<style>
 
  .modal-container.expanded {
   width: 300px;
+}
+
+.modal-container.hide {
+  opacity: 0;
 }
 
  .top-navbar {
@@ -197,6 +227,9 @@ const css = `<style>
 
 .image-count {
   text-align: center;
+}
+.exporting-screen img {
+  width: 100%;
 }
 
 </style>`;
