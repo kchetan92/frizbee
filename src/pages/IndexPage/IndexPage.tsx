@@ -99,6 +99,9 @@ const IndexPage = () => {
         exportImages(allImages.current).then(() => {
           allImages.current.clear();
           setNewImage(null);
+          chrome.storage.local.set({
+            modalView: 'close',
+          });
         });
       }
     });
