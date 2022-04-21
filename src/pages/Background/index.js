@@ -22,13 +22,16 @@ chrome.storage.local.get(['modalView'], function(result) {
 
 
 chrome.action.onClicked.addListener(
-    () => {
+    async () => {
         console.log("clicked background22");
         chrome.storage.local.get(['modalView'], function(result) {
             const nextToggle = result["modalView"] === "open" ? "close" : "open";
             chrome.storage.local.set({ modalView: nextToggle }, () => {});
         })
-    
+
+        let url = chrome.runtime.getURL("index.html");
+        let tab = await chrome.tabs.create({url});
+
     });
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {

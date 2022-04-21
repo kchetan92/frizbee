@@ -35,23 +35,30 @@ const Modal = (pr: {
     if (changes.stage && changes.stage.newValue !== stage) {
       setStage(changes.stage.newValue);
     }
+    if (changes.showModal) {
+      debugger;
+      setModalVisible(true);
+    }
   });
 
   const startCapture = async () => {
-    if (mediaStream?.current) {
+    if (mediaStreamAvailable?.current) {
       setStage('capturing');
-    } else {
-      setStage('loading');
-      const mediaObj = await getStream(mediaStream);
-      console.log(mediaObj);
-      if (mediaStream.current) {
-        setStage('capturing');
-        chrome.storage.local.set({
-          mediaStreamAvailable: true,
-        });
-      } else {
-        setStage('error');
-      }
+    }
+    // else {
+    //   setStage('loading');
+    //   const mediaObj = await getStream(mediaStream);
+    //   console.log(mediaObj);
+    //   if (mediaStream.current) {
+    //     setStage('capturing');
+    //     chrome.storage.local.set({
+    //       mediaStreamAvailable: true,
+    //     });
+    //   }
+
+    // }
+    else {
+      setStage('error');
     }
   };
 
@@ -83,14 +90,9 @@ const Modal = (pr: {
 
       {stage === 'initial' && InitialStage}
       {stage === 'loading' && <Loading />}
-      {stage === 'capturing' &&
-        (mediaStream?.current || mediaStreamAvailable.current) && (
-          <CaptureMode
-            mediaStream={mediaStream?.current || undefined}
-            setStage={setStage}
-            setModalVisible={setModalVisible}
-          />
-        )}
+      {stage === 'capturing' && mediaStreamAvailable.current && (
+        <CaptureMode setStage={setStage} setModalVisible={setModalVisible} />
+      )}
       {stage === 'exporting' && Exporting}
       {stage === 'error' && <Error />}
     </div>
