@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import JSZip from 'jszip';
 import './IndexPage.css';
 import './IndexPage.scss';
+import exportImages from '../Content/components/exportImages';
 
 const IndexPage = () => {
   const mediaStream = useRef<MediaStream | null>(null);
   const canvasElement = useRef<HTMLCanvasElement>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
-  const zipObject = useRef<any>(null);
   const allImages = useRef<Set<string>>(new Set());
   const [latestImage, setNewImage] = useState<string | null>(null);
   const [imageCount, setImageCount] = useState<number>(0);
@@ -22,6 +21,7 @@ const IndexPage = () => {
       console.log('mediaObj saved ', mediaObj);
       chrome.storage.local.set({
         mediaStreamAvailable: true,
+        stage: 'initial',
       });
       setMediaStreamAvailable(true);
     }
@@ -68,12 +68,14 @@ const IndexPage = () => {
 
   useEffect(() => {
     chrome.storage.local.set({ modalView: 'open' }, () => {});
-    zipObject.current = new JSZip();
-    // if (!mediaStream?.current) {
-    //   startCapture();
-    // } else {
-    //   setMediaStreamAvailable(true);
-    // }
+    allImages.current.clear();
+    setNewImage(null);
+
+    chrome.storage.local.set({
+      latestImage: null,
+      imageCount: 0,
+      stage: 'initial',
+    });
 
     console.log('mediaStreamAvailable, ', mediaStreamAvailable);
 
@@ -89,6 +91,14 @@ const IndexPage = () => {
           chrome.storage.local.set({
             showModal: Date.now(),
           });
+        });
+      }
+
+      if (changes.exportNow) {
+        window.alert('download available');
+        exportImages(allImages.current).then(() => {
+          allImages.current.clear();
+          setNewImage(null);
         });
       }
     });

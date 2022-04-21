@@ -36,7 +36,6 @@ const Modal = (pr: {
       setStage(changes.stage.newValue);
     }
     if (changes.showModal) {
-      debugger;
       setModalVisible(true);
     }
   });
@@ -134,7 +133,6 @@ const NavBar = React.forwardRef(
         </button>
         <button
           onClick={() => {
-            debugger;
             chrome.storage.local.set({ modalView: 'close' }, () => {});
           }}
         >

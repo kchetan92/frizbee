@@ -69,7 +69,6 @@ const CaptureMode = (pr: {
   };
 
   const click = (e?: MouseEvent) => {
-    debugger;
     if (!pr.mediaStream) {
       pr.setModalVisible(false);
       chrome.storage.local.set({

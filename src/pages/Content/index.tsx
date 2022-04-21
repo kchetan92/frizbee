@@ -8,7 +8,6 @@ const initModal = (pr: {
   mediaStreamAvailable?: boolean;
   stage?: stageOptions;
 }) => {
-  debugger;
   const shadow = getShadow();
   if (shadow.shadowRoot) {
     const container = shadow.shadowRoot.getElementById('container');

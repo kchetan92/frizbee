@@ -7,12 +7,8 @@ const CaptureMode = (pr: {
   setStage: (a: stageOptions) => void;
   setModalVisible: (a: boolean) => void;
 }) => {
-  const canvasElement = useRef<HTMLCanvasElement>(null);
-  const videoElement = useRef<HTMLVideoElement>(null);
-  const zipObject = useRef<any>(null);
   const imgElement = useRef<HTMLImageElement>(null);
   const [latestImage, setNewImage] = useState<string | null>(null);
-  const allImages = useRef<Set<string>>(new Set());
   const [imageCount, setImageCount] = useState<number>(0);
   const [mode, setMode] = useState<'running' | 'export'>('running');
 
@@ -46,9 +42,11 @@ const CaptureMode = (pr: {
 
   const click = () => {
     pr.setModalVisible(false);
-    chrome.storage.local.set({
-      takeImage: Date.now(),
-    });
+    setTimeout(() => {
+      chrome.storage.local.set({
+        takeImage: Date.now(),
+      });
+    }, 0);
   };
 
   useEffect(() => {
@@ -76,15 +74,9 @@ const CaptureMode = (pr: {
             e.preventDefault();
             e.stopPropagation();
             pr.setStage('exporting');
-            // if (pr.mediaStream && allImages.current.size > 0) {
-            //   exportImages(allImages.current)
-            //     .then((e) => pr.setStage('initial'))
-            //     .catch((e) => pr.setStage('error'));
-            // } else {
-            //   chrome.storage.local.set({
-            //     exportNow: Date.now(),
-            //   });
-            // }
+            chrome.storage.local.set({
+              exportNow: Date.now(),
+            });
           }}
         >
           Export
