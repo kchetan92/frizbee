@@ -18,6 +18,16 @@ const CaptureMode = (pr: {
 
   useEffect(() => {
     document.addEventListener('click', click);
+
+    chrome.storage.local.get(['latestImage', 'imageCount'], function (res) {
+      if (res.latestImage) {
+        setNewImage(res.latestImage);
+      }
+      if (res.imageCount) {
+        setImageCount(res.imageCount);
+      }
+    });
+
     return () => {
       document.removeEventListener('click', click);
     };
@@ -80,8 +90,6 @@ const CaptureMode = (pr: {
           Export
         </button>
       )}
-      <canvas className="hidden" ref={canvasElement} />
-      <video className="hidden" ref={videoElement} />
     </>
   );
 };
